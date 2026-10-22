@@ -15,6 +15,7 @@ from ._core.model import EmbeddingModel
 from ._core.data import Dataset
 from ._core.random import Streams, seed_all
 from ._core.query import (
+    N_SPECIFIC_PEAKS,
     path_scores,
     relation_scores,
     embedding_scores,
@@ -356,6 +357,10 @@ def infer_regulators(
             ),
         )
         specificity = stats[ct]["specificity"]
+        # Supporting peaks are taken from the specific peaks that enter the first term of
+        # the family score, i.e. the N_s most specific peaks of the cell type.
+        specific = np.zeros(a.n_vars, dtype=bool)
+        specific[np.argsort(-specificity, kind="mergesort")[:N_SPECIFIC_PEAKS]] = True
         for rank, family in enumerate(ordered, 1):
             ranks.append(
                 {
@@ -370,7 +375,7 @@ def infer_regulators(
                 continue
             family_path = (dot[:, ids[family]] + rel[:, ids[family]]).max(axis=1)
             contributions = specificity + family_path
-            candidates = np.flatnonzero(linked[family])
+            candidates = np.flatnonzero(linked[family] & specific)
             for k, ix in enumerate(
                 candidates[
                     np.argsort(-contributions[candidates], kind="mergesort")[:50]
