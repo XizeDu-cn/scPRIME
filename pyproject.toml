@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scprime-atac"
+version = "0.1.0"
+description = "Cell embeddings, regulator discovery and single-cell TF activity from chromatin accessibility"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {file = "LICENSE"}
+dependencies = ["torch==2.3.0", "numpy==1.26.4", "scipy==1.13.1", "pandas==2.2.2", "anndata==0.10.7", "h5py==3.11.0", "scikit-learn==1.5.0"]
+
+[project.scripts]
+scprime = "scprime.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["scprime*"]
